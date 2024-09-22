@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define MAX_NODES 100
 
 typedef struct Node {
     int key, level, height;
@@ -13,20 +14,24 @@ void printLevel(Node* root, int level);
 void printTree(Node* root);
 
 int main() {
-    Node* root = NULL;
-
     Node* nodes[100] = {NULL};
 
     int index = 0;
 
-    int keys[] = {10, 5, 15, 3, 7, 13, 20, 1, 4, 6};
+
+    int keys[] = { 10, 5, 15, 3, 7, 13, 20, 1, 4, 6 };
+    ;
     int n = sizeof(keys) / sizeof(keys[0]);
+    if (n > MAX_NODES) {
+        printf("Error: The number of keys exceeds the maximum allowed limit of %d.\n", MAX_NODES);
+        exit(1);
+    }
 
     for (int i = 0; i < n; i++) {
         insert(nodes, keys[i], &index);
     }
 
-    printf("binary tree by level: \n");
+    printf("binary tree by level:\n\n");
     printTree(nodes[0]);
 
     return 0;
@@ -34,6 +39,12 @@ int main() {
 
 Node* newNode(int key) {
     Node* temp = (Node*)malloc(sizeof(Node));
+
+    if (temp == NULL) {
+        printf("Error: Memory Allocation.\n");
+        exit(1);
+    }
+
     temp->parent = NULL;
     temp->key = key;
     temp->left = temp->right = NULL;
@@ -83,15 +94,33 @@ int height(Node* node) {
 void printLevel(Node* root, int level) {
     if (root == NULL) return;
     if (level == 1) {
-        printf("%d\theight: %d\tlevel: %d\t", root->key, root->height, root->level);
-        if (root->parent == NULL) printf("root\n");
-        else printf("parent: %d\n", *(root->parent));
+        printf("Node: %d\nAdress: %p\nHeight: %d\nLevel: %d\n", root->key, (void*)root, root->height, root->level);
+
+        //printf("Address: %p\t", (void*)root);
+
+        if (root->parent == NULL)
+            printf("Root (no parent)\n");
+        else
+            printf("Parent: %d (Address: %p)\n", root->parent->key, (void*)root->parent);
+
+        if (root->left != NULL)
+            printf("Left Child: %d (Address: %p)\n", root->left->key, (void*)root->left);
+        else
+            printf("Left Child: NULL\n");
+
+        if (root->right != NULL)
+            printf("Right Child: %d (Address: %p)\n\n", root->right->key, (void*)root->right);
+        else
+            printf("Right Child: NULL\n\n");
+
+        printf("\n");
     }
     else if (level > 1) {
         printLevel(root->left, level - 1);
         printLevel(root->right, level - 1);
     }
 }
+
 
 void printTree(Node* root) {
     int h = height(root);
